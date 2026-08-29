@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Instrument Serif Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<title>Study Reminder Chat</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: 100%;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Instrument Serif", Georgia, serif;
+        background-color: #191919;
+        padding: 26px;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .sparkles-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .sparkles-bg {
+        position: absolute;
+        top: -39px;
+        left: -39px;
+        right: -39px;
+        bottom: -39px;
+        pointer-events: none;
+        z-index: 0;
+        color: #e8a5ac;
+        user-select: none;
+    }
+
+    .sparkle {
+        position: absolute;
+        opacity: 0.35;
+        text-shadow: 0 0 10px rgba(232, 165, 172, 0.4);
+    }
+
+    .sp-1  { top: 5%;   left: 2%;   font-size: 23px; opacity: 0.4; }
+    .sp-2  { top: 10%;  right: 4%;  font-size: 18px; opacity: 0.3; }
+    .sp-3  { top: 28%;  left: -2%; font-size: 16px; opacity: 0.25; }
+    .sp-4  { top: 35%;  right: -5%; font-size: 26px; opacity: 0.45; }
+    .sp-5  { top: 58%;  left: -4%; font-size: 21px; opacity: 0.3; }
+    .sp-6  { top: 62%;  right: -2%; font-size: 16px; opacity: 0.25; }
+    .sp-7  { top: 82%;  left: 3%;   font-size: 29px; opacity: 0.4; }
+    .sp-8  { top: 88%;  right: 5%;  font-size: 21px; opacity: 0.35; }
+    .sp-9  { bottom: -20px; left: 30%; font-size: 16px; opacity: 0.25; }
+    .sp-10 { bottom: -23px; right: 30%; font-size: 23px; opacity: 0.4; }
+
+    .pink-gradient-text {
+        background: linear-gradient(180deg, #e06e7f 0%, #e8a5ac 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .chat-card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 546px;
+        min-height: 676px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 21px 21px 16px;
+        border-radius: 26px;
+        background-image: url("https://i.pinimg.com/736x/03/5d/89/035d89c54e011c08a47b62ae9b90aa96.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        box-shadow: 0 13px 32px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+    }
+
+    .contact-bar {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 10px 16px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 235, 240, 0.72) 100%);
+        box-shadow: 0 3px 13px rgba(0, 0, 0, 0.08), 0 0 13px rgba(255, 214, 225, 0.4);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        margin-bottom: 16px;
+    }
+
+    .header-pfp {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 3px 8px rgba(224, 110, 127, 0.25);
+    }
+
+    .contact-name {
+        font-size: clamp(20px, 4.5vw, 23px);
+        letter-spacing: 0.6px;
+        line-height: 1;
+    }
+
+    .chat-flow {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        margin-bottom: 16px;
+        max-height: 380px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .chat-flow::-webkit-scrollbar {
+        width: 4px;
+    }
+    .chat-flow::-webkit-scrollbar-thumb {
+        background: rgba(224, 110, 127, 0.4);
+        border-radius: 4px;
+    }
+
+    .message-group {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .message-group.user {
+        flex-direction: row-reverse;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pfp {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12), 0 0 10px rgba(255, 214, 225, 0.4);
+    }
+
+    .bubble {
+        border-radius: 21px 21px 21px 5px;
+        padding: 10px 16px;
+        font-size: 19px;
+        line-height: 1.35;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 235, 240, 0.88) 100%);
+        box-shadow: 0 4px 13px rgba(0, 0, 0, 0.08), 0 0 16px rgba(255, 214, 225, 0.5);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        max-width: 80%;
+    }
+
+    .message-group.user .bubble {
+        border-radius: 21px 21px 5px 21px;
+        background: linear-gradient(180deg, #e06e7f 0%, #d45d6f 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 13px rgba(224, 110, 127, 0.3);
+    }
+
+    .bubble-text {
+        color: #e06e7f;
+        display: inline;
+    }
+
+    .message-group.user .bubble-text {
+        color: #ffffff;
+    }
+
+    .gift-card-bubble {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+        padding: 6px 4px;
+    }
+
+    .gift-img {
+        width: 140px;
+        height: 110px;
+        border-radius: 12px;
+        object-fit: cover;
+		box-shadow: 0 4px 13px rgba(0, 0, 0, 0.08), 0 0 16px rgba(255, 214, 225, 0.5);
+		}
+
+    .gift-title {
+        font-size: 17px;
+        font-weight: bold;
+        color: #d45d6f;
+    }
+
+    .quick-replies {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 8px;
+        justify-content: center;
+    }
+
+    .reply-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: none;
+        background: rgba(255, 255, 255, 0.9);
+        color: #e06e7f;
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .reply-btn:hover {
+        background: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(224, 110, 127, 0.3);
+    }
+
+    .reply-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .input-keyboard-panel {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 230, 236, 0.82) 100%);
+        border-radius: 18px;
+        padding: 8px;
+        box-shadow: 0 5px 16px rgba(0, 0, 0, 0.1), 0 0 13px rgba(255, 214, 225, 0.4);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        user-select: none;
+    }
+
+    .message-bar {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 16px;
+        padding: 5px 8px 5px 16px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(224, 110, 127, 0.18);
+        min-height: 38px;
+    }
+
+    .input-text {
+        font-size: 17px;
+        color: #e06e7f;
+    }
+
+    .input-placeholder {
+        opacity: 0.6;
+    }
+
+    .send-btn {
+        width: 29px;
+        height: 29px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, #e06e7f 0%, #e8a5ac 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        box-shadow: 0 3px 5px rgba(224, 110, 127, 0.3);
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .send-btn.active {
+        transform: scale(1.1);
+        background: linear-gradient(180deg, #d45d6f 0%, #e06e7f 100%);
+    }
+
+    .keyboard-snippet {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .kb-row {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .kb-key {
+        height: 31px;
+        flex: 1;
+        max-width: 42px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15.5px;
+        font-weight: 600;
+        color: #e06e7f;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        transition: all 0.1s ease;
+    }
+
+    .kb-key.pressed {
+        background: #e06e7f;
+        color: #ffffff;
+        transform: translateY(2px);
+    }
+
+    .kb-key.space {
+        max-width: 169px;
+    }
+
+    .blocked-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(25, 25, 25, 0.96);
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        text-align: center;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .blocked-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 16px;
+        filter: grayscale(100%);
+        opacity: 0.6;
+    }
+
+    .blocked-title {
+        color: #e06e7f;
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .blocked-desc {
+        color: #888888;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    .reset-hint {
+        color: #555;
+        font-size: 13px;
+        font-style: italic;
+    }
+
+    .timer-pill {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 230, 236, 0.9) 100%);
+        border: 1px solid rgba(224, 110, 127, 0.3);
+        padding: 5px 12px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .timer-pill:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 16px rgba(224, 110, 127, 0.25);
+    }
+
+    .timer-text {
+        font-size: 14px;
+        font-weight: bold;
+        color: #e06e7f;
+    }
+
+    .skip-badge {
+        background: #e06e7f;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fff0f3 100%);
+        border-radius: 22px;
+        padding: 24px;
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 214, 225, 0.6);
+        border: 1px solid rgba(224, 110, 127, 0.2);
+    }
+
+    .modal-title {
+        color: #e06e7f;
+        font-size: 22px;
+        margin-bottom: 6px;
+    }
+
+    .modal-time {
+        font-size: 28px;
+        font-weight: bold;
+        color: #d45d6f;
+        margin: 10px 0;
+    }
+
+    .modal-desc {
+        color: #777777;
+        font-size: 15px;
+        margin-bottom: 18px;
+        line-height: 1.3;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .modal-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 12px;
+        border: none;
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn.primary {
+        background: linear-gradient(180deg, #e06e7f 0%, #d45d6f 100%);
+        color: #ffffff;
+        box-shadow: 0 3px 10px rgba(224, 110, 127, 0.3);
+    }
+
+    .modal-btn.secondary {
+        background: rgba(224, 110, 127, 0.1);
+        color: #e06e7f;
+    }
+
+    .modal-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 600px) {
+        .chat-card {
+            padding: 18px 13px 13px;
+            max-width: 440px;
+        }
+        .pfp, .header-pfp {
+            width: 36px;
+            height: 36px;
+        }
+        .bubble {
+            font-size: 17px;
+            padding: 9px 13px;
+        }
+        .kb-key {
+            height: 26px;
+            font-size: 13px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="sparkles-container">
+    <div class="sparkles-bg">
+        <span class="sparkle sp-1">✦</span>
+        <span class="sparkle sp-2">*</span>
+        <span class="sparkle sp-3">.</span>
+        <span class="sparkle sp-4">✦</span>
+        <span class="sparkle sp-5">˚</span>
+        <span class="sparkle sp-6">.</span>
+        <span class="sparkle sp-7">✦</span>
+        <span class="sparkle sp-8">*</span>
+        <span class="sparkle sp-9">˚</span>
+        <span class="sparkle sp-10">✦</span>
+    </div>
+
+    <div class="chat-card" id="chatCard">
+        <div class="timer-pill" id="timerPill" style="display:none;" onclick="openSkipModal()">
+            <span class="timer-text" id="pillTimeText">60:00</span>
+            <span class="skip-badge">Skip</span>
+        </div>
+
+        <div class="contact-bar">
+            <img src="https://i.pinimg.com/736x/cf/3e/99/cf3e9929590d4bad77f70f340c4b3cd8.jpg" alt="pfp" class="header-pfp">
+            <div class="contact-name pink-gradient-text">madoka ₍ᐢ. .ᐢ₎</div>
+        </div>
+
+        <div class="chat-flow" id="chatFlow"></div>
+
+        <div class="input-keyboard-panel">
+            <div class="quick-replies" id="quickReplies"></div>
+            
+            <div class="message-bar">
+                <span class="input-text" id="inputText"><span class="input-placeholder">iMessage...</span></span>
+                <div class="send-btn" id="sendBtn">↑</div>
+            </div>
+
+            <div class="keyboard-snippet" id="keyboard">
+                <div class="kb-row">
+                    <span class="kb-key" data-key="q">q</span><span class="kb-key" data-key="w">w</span><span class="kb-key" data-key="e">e</span><span class="kb-key" data-key="r">r</span><span class="kb-key" data-key="t">t</span><span class="kb-key" data-key="y">y</span><span class="kb-key" data-key="u">u</span><span class="kb-key" data-key="i">i</span><span class="kb-key" data-key="o">o</span><span class="kb-key" data-key="p">p</span>
+                </div>
+                <div class="kb-row">
+                    <span class="kb-key" data-key="a">a</span><span class="kb-key" data-key="s">s</span><span class="kb-key" data-key="d">d</span><span class="kb-key" data-key="f">f</span><span class="kb-key" data-key="g">g</span><span class="kb-key" data-key="h">h</span><span class="kb-key" data-key="j">j</span><span class="kb-key" data-key="k">k</span><span class="kb-key" data-key="l">l</span>
+                </div>
+                <div class="kb-row">
+                    <span class="kb-key">⇧</span><span class="kb-key" data-key="z">z</span><span class="kb-key" data-key="x">x</span><span class="kb-key" data-key="c">c</span><span class="kb-key" data-key="v">v</span><span class="kb-key" data-key="b">b</span><span class="kb-key" data-key="n">n</span><span class="kb-key" data-key="m">m</span><span class="kb-key">⌫</span>
+                </div>
+                <div class="kb-row">
+                    <span class="kb-key">123</span><span class="kb-key space" data-key=" ">space</span><span class="kb-key">return</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="blocked-screen" id="blockedScreen" style="display: none;">
+            <img src="https://i.pinimg.com/736x/cf/3e/99/cf3e9929590d4bad77f70f340c4b3cd8.jpg" class="blocked-avatar" alt="pfp">
+            <div class="blocked-title">MADOKA BLOCKED YOU</div>
+            <div class="blocked-desc">you kept slacking off... madoka got fed up and gave up on you. go study!</div>
+            <div class="reset-hint">auto-resetting in 10 seconds...</div>
+        </div>
+
+        <div class="modal-overlay" id="skipModal" style="display: none;">
+            <div class="modal-card">
+                <div class="modal-title" id="modalTitle">study timer active ₍ᐢ. .ᐢ₎</div>
+                <div class="modal-time" id="modalTimerDisplay">60:00</div>
+                <div class="modal-desc" id="modalDesc">madoka will check in soon! would you like to skip the wait?</div>
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeSkipModal()">keep waiting</button>
+                    <button class="modal-btn primary" onclick="confirmSkip()" id="modalSkipBtn">skip timer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sound Notification Audio -->
+<audio id="msgAudio" src="https://vulnerable-green-ybkhxrof.edgeone.dev/" preload="auto"></audio>
+
+<script>
+    const MADOKA_PFP = "https://i.pinimg.com/736x/cf/3e/99/cf3e9929590d4bad77f70f340c4b3cd8.jpg";
+    const INITIAL_MESSAGES = [
+        "hey!",
+        "did you study yet? don't forget to review your notes, watch videos explaining the topic, and quiz yourself on blooket!",
+        "prepare well, and keep going! ( ˶˘ ³˘(ˊᗜˋ*)!♡"
+    ];
+
+    let state = JSON.parse(localStorage.getItem('madoka_chat_state')) || {
+        stage: 'INITIAL',
+        mode: '1HOUR',
+        unproductiveCount: 0,
+        timestamp: null,
+        history: []
+    };
+
+    const chatFlow = document.getElementById('chatFlow');
+    const quickReplies = document.getElementById('quickReplies');
+    const inputText = document.getElementById('inputText');
+    const sendBtn = document.getElementById('sendBtn');
+    const blockedScreen = document.getElementById('blockedScreen');
+    const timerPill = document.getElementById('timerPill');
+    const pillTimeText = document.getElementById('pillTimeText');
+    const skipModal = document.getElementById('skipModal');
+    const modalTimerDisplay = document.getElementById('modalTimerDisplay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalSkipBtn = document.getElementById('modalSkipBtn');
+    const msgAudio = document.getElementById('msgAudio');
+
+    let countdownInterval = null;
+
+    function playMessageSound(isSpecialAlert = false) {
+        try {
+            if (isSpecialAlert) {
+                // Play custom alert sound for 3 seconds
+                msgAudio.currentTime = 0;
+                msgAudio.play().then(() => {
+                    setTimeout(() => {
+                        msgAudio.pause();
+                    }, 3000);
+                }).catch(e => console.log("Audio play blocked by browser:", e));
+            } else {
+                // Play standard short subtle notification pop/chime
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    function saveState() {
+        localStorage.setItem('madoka_chat_state', JSON.stringify(state));
+    }
+
+    function scrollToBottom() {
+        chatFlow.scrollTop = chatFlow.scrollHeight;
+    }
+
+    function addMessage(text, isUser = false, isGift = false, saveToHistory = true, soundType = 'none') {
+        if (!isUser && soundType !== 'none') {
+            playMessageSound(soundType === 'special');
+        }
+
+        const group = document.createElement('div');
+        group.className = `message-group ${isUser ? 'user' : ''}`;
+        
+        if (!isUser) {
+            const pfp = document.createElement('img');
+            pfp.src = MADOKA_PFP;
+            pfp.className = 'pfp';
+            group.appendChild(pfp);
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        
+        if (isGift) {
+            bubble.innerHTML = `
+                <div class="gift-card-bubble">
+                    <img src="https://cdn.discordapp.com/attachments/1227779114824368170/1543293746794209491/53_-removebg-preview.png?ex=6a9457ce&is=6a93064e&hm=c8feca54c2a369ec678dc22dbf6f199d3ddbcc9a4c901d189e2eb7192db93116" class="gift-img" alt="Cute Cake Reward">
+                    <div class="gift-title">sweet cake & parfait voucher!</div>
+                    <span class="bubble-text" style="font-size: 15px;">"you worked so hard! treat yourself to a sweet pastry! voucher: STUDY-PASTRY-99"</span>
+                </div>
+            `;
+        } else {
+            const txt = document.createElement('span');
+            txt.className = 'bubble-text';
+            txt.textContent = text;
+            bubble.appendChild(txt);
+        }
+        
+        group.appendChild(bubble);
+        chatFlow.appendChild(group);
+        scrollToBottom();
+
+        if (saveToHistory) {
+            state.history.push({ text, isUser, isGift });
+            saveState();
+        }
+    }
+
+    function renderHistory() {
+        chatFlow.innerHTML = '';
+        if (!state.history || state.history.length === 0) {
+            INITIAL_MESSAGES.forEach((msg, idx) => {
+                // Play special sound only for the very first message after initiation
+                addMessage(msg, false, false, true, idx === 0 ? 'special' : 'normal');
+            });
+        } else {
+            state.history.forEach(msg => addMessage(msg.text, msg.isUser, msg.isGift || false, false, 'none'));
+        }
+    }
+
+    function setPlaceholder() {
+        inputText.innerHTML = '<span class="input-placeholder">iMessage...</span>';
+    }
+
+    function typeAndSend(text, onComplete) {
+        quickReplies.querySelectorAll('button').forEach(btn => btn.disabled = true);
+        inputText.textContent = '';
+        let index = 0;
+
+        function typeNextChar() {
+            if (index < text.length) {
+                const char = text[index];
+                inputText.textContent += char;
+
+                const keyEl = document.querySelector(`.kb-key[data-key="${char.toLowerCase()}"]`);
+                if (keyEl) {
+                    keyEl.classList.add('pressed');
+                    setTimeout(() => keyEl.classList.remove('pressed'), 120);
+                }
+
+                index++;
+                setTimeout(typeNextChar, 80 + Math.random() * 50);
+            } else {
+                setTimeout(() => {
+                    sendBtn.classList.add('active');
+                    setTimeout(() => {
+                        sendBtn.classList.remove('active');
+                        addMessage(text, true);
+                        setPlaceholder();
+                        if (onComplete) onComplete();
+                    }, 250);
+                }, 200);
+            }
+        }
+        typeNextChar();
+    }
+
+    function renderOptions() {
+        quickReplies.innerHTML = '';
+
+        if (state.stage === 'INITIAL') {
+            const yesBtn = document.createElement('button');
+            yesBtn.className = 'reply-btn';
+            yesBtn.textContent = 'yes, i will!';
+            yesBtn.onclick = () => handleChoice('YES');
+
+            const noBtn = document.createElement('button');
+            noBtn.className = 'reply-btn';
+            noBtn.textContent = 'no...';
+            noBtn.onclick = () => handleChoice('NO');
+
+            quickReplies.appendChild(yesBtn);
+            quickReplies.appendChild(noBtn);
+            timerPill.style.display = 'none';
+        } 
+        else if (state.stage === 'WAITING_FOR_CHECKIN') {
+            timerPill.style.display = 'flex';
+        } 
+        else if (state.stage === 'CHECKIN_ASKED') {
+            timerPill.style.display = 'none';
+            const goodBtn = document.createElement('button');
+            goodBtn.className = 'reply-btn';
+            goodBtn.textContent = "i've done a lot!";
+            goodBtn.onclick = () => handleCheckInResponse('GOOD');
+
+            const badBtn = document.createElement('button');
+            badBtn.className = 'reply-btn';
+            badBtn.textContent = "haven't done much...";
+            badBtn.onclick = () => handleCheckInResponse('BAD');
+
+            quickReplies.appendChild(goodBtn);
+            quickReplies.appendChild(badBtn);
+        }
+        else if (state.stage === 'COMPLETED') {
+            timerPill.style.display = 'none';
+            const newSessionBtn = document.createElement('button');
+            newSessionBtn.className = 'reply-btn';
+            newSessionBtn.textContent = 'start new study session';
+            newSessionBtn.onclick = () => resetAll();
+
+            quickReplies.appendChild(newSessionBtn);
+        }
+    }
+
+    function handleChoice(choice) {
+        if (choice === 'YES') {
+            typeAndSend('yes, i will!', () => {
+                state.stage = 'WAITING_FOR_CHECKIN';
+                state.mode = '1HOUR';
+                state.unproductiveCount = 0;
+                state.timestamp = Date.now();
+                saveState();
+                renderOptions();
+                startTimer();
+            });
+        } else {
+            typeAndSend('no...', () => {
+                state.stage = 'BLOCKED';
+                saveState();
+                showBlockedScreen();
+            });
+        }
+    }
+
+    function handleCheckInResponse(type) {
+        if (type === 'GOOD') {
+            typeAndSend("i've done a lot!", () => {
+                setTimeout(() => {
+                    addMessage("YAY!! ₍ᐢ. .ᐢ₎ sounds like you worked super hard! as a sweet reward, here's a gift for you! (˶˃ ᵕ ˂˶)", false, false, true, 'normal');
+                    setTimeout(() => {
+                        addMessage("", false, true, true, 'none'); // Send gift bubble without additional sound
+                        finishSession();
+                    }, 800);
+                }, 600);
+            });
+        } else {
+            typeAndSend("haven't done much...", () => {
+                state.unproductiveCount = (state.unproductiveCount || 0) + 1;
+                
+                if (state.unproductiveCount >= 3) {
+                    // Block user after saying "haven't done much..." 3 times
+                    setTimeout(() => {
+                        addMessage("that's 3 times now!! you keep saying you haven't done anything... i'm really fed up, i give up on you! (＞﹏＜)", false, false, true, 'normal');
+                        setTimeout(() => {
+                            state.stage = 'BLOCKED';
+                            saveState();
+                            showBlockedScreen();
+                        }, 1200);
+                    }, 600);
+                } else if (state.unproductiveCount === 1) {
+                    setTimeout(() => {
+                        addMessage("oh no! (っ.-) okay, starting now, i will check in on you every 20 minutes to make sure you stay on track!", false, false, true, 'normal');
+                        state.stage = 'WAITING_FOR_CHECKIN';
+                        state.mode = '20MIN';
+                        state.timestamp = Date.now();
+                        saveState();
+                        renderOptions();
+                        startTimer();
+                    }, 600);
+                } else {
+                    // 2nd unproductive response warning
+                    setTimeout(() => {
+                        addMessage("still nothing?! ( •̀⤙•́ ) please try to focus! i'm checking in again in 20 minutes. don't make me lose hope!", false, false, true, 'normal');
+                        state.stage = 'WAITING_FOR_CHECKIN';
+                        state.mode = '20MIN';
+                        state.timestamp = Date.now();
+                        saveState();
+                        renderOptions();
+                        startTimer();
+                    }, 600);
+                }
+            });
+        }
+    }
+
+    function triggerCheckIn(wasSkipped = false) {
+        clearInterval(countdownInterval);
+        state.stage = 'CHECKIN_ASKED';
+        saveState();
+
+        // Plays special 3-second sound because Madoka is reaching out first after a waiting period
+        if (state.mode === '20MIN') {
+            if (wasSkipped) {
+                addMessage("checking in early! ( •̀⤙•́ ) how is your 20-minute focus going?", false, false, true, 'special');
+            } else {
+                addMessage("20 minutes are up! ( •̀⤙•́ ) did you manage to get some studying done this time?", false, false, true, 'special');
+            }
+        } else {
+            if (wasSkipped) {
+                addMessage("so impatient... couldn't wait? ԅ(¯ㅂ¯ԅ) ok... how's your studying going so far?", false, false, true, 'special');
+            } else {
+                addMessage("wow!! it's already been a whole hour! time flies! ₍ᐢ. .ᐢ₎ how is your progress coming along?", false, false, true, 'special');
+            }
+        }
+
+        renderOptions();
+    }
+
+    function openSkipModal() {
+        const is20 = state.mode === '20MIN';
+        modalTitle.textContent = is20 ? "20-min check-in active ₍ᐢ. .ᐢ₎" : "1-hour check-in active ₍ᐢ. .ᐢ₎";
+        modalDesc.textContent = is20 ? "madoka will check in every 20 minutes! skip the wait now?" : "madoka will check in in 1 hour! skip the wait now?";
+        modalSkipBtn.textContent = is20 ? "skip 20 mins" : "skip 1 hour";
+        updateTimerDisplay();
+        skipModal.style.display = 'flex';
+    }
+
+    function closeSkipModal() {
+        skipModal.style.display = 'none';
+    }
+
+    function confirmSkip() {
+        closeSkipModal();
+        triggerCheckIn(true);
+    }
+
+    function startTimer() {
+        clearInterval(countdownInterval);
+        if (state.stage !== 'WAITING_FOR_CHECKIN' || !state.timestamp) return;
+
+        const timerDuration = (state.mode === '20MIN') ? (20 * 60 * 1000) : (60 * 60 * 1000);
+
+        function tick() {
+            const elapsed = Date.now() - state.timestamp;
+            const remaining = timerDuration - elapsed;
+
+            if (remaining <= 0) {
+                clearInterval(countdownInterval);
+                triggerCheckIn(false);
+            } else {
+                const totalSec = Math.floor(remaining / 1000);
+                const mins = Math.floor(totalSec / 60);
+                const secs = totalSec % 60;
+                const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                
+                pillTimeText.textContent = formatted;
+                modalTimerDisplay.textContent = formatted;
+            }
+        }
+
+        tick();
+        countdownInterval = setInterval(tick, 1000);
+    }
+
+    function updateTimerDisplay() {
+        if (state.timestamp) {
+            const timerDuration = (state.mode === '20MIN') ? (20 * 60 * 1000) : (60 * 60 * 1000);
+            const remaining = Math.max(0, timerDuration - (Date.now() - state.timestamp));
+            const totalSec = Math.floor(remaining / 1000);
+            const mins = Math.floor(totalSec / 60);
+            const secs = totalSec % 60;
+            const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            pillTimeText.textContent = formatted;
+            modalTimerDisplay.textContent = formatted;
+        }
+    }
+
+    function showBlockedScreen() {
+        blockedScreen.style.display = 'flex';
+        setTimeout(() => {
+            resetAll();
+        }, 10000);
+    }
+
+    function finishSession() {
+        state.stage = 'COMPLETED';
+        saveState();
+        renderOptions();
+    }
+
+    function resetAll() {
+        localStorage.removeItem('madoka_chat_state');
+        state = {
+            stage: 'INITIAL',
+            mode: '1HOUR',
+            unproductiveCount: 0,
+            timestamp: null,
+            history: []
+        };
+        blockedScreen.style.display = 'none';
+        closeSkipModal();
+        renderHistory();
+        renderOptions();
+    }
+
+    // Initialize State
+    renderHistory();
+    if (state.stage === 'BLOCKED') {
+        showBlockedScreen();
+    } else {
+        renderOptions();
+        if (state.stage === 'WAITING_FOR_CHECKIN') {
+            startTimer();
+        }
+    }
+</script>
+
+</body>
+</html>
