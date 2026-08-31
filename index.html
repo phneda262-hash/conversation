@@ -23,17 +23,17 @@
         min-height: 100%;
     }
 
-    body {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: "Instrument Serif", Georgia, serif;
-        background-color: #191919;
-        padding: 26px;
-        position: relative;
-        overflow-x: hidden;
-    }
+	body {
+	        min-height: 100vh;
+	        display: flex;
+	        align-items: flex-start; /* Shifts vertical alignment from center to top */
+	        justify-content: center;
+	        font-family: "Instrument Serif", Georgia, serif;
+	        background-color: #191919;
+	        padding: 10px 26px 26px; /* Reduced top padding from 26px to 10px */
+	        position: relative;
+	        overflow-x: hidden;
+	    }
 
     .sparkles-container {
         position: relative;
@@ -702,7 +702,7 @@
         if (isGift) {
             bubble.innerHTML = `
                 <div class="gift-card-bubble">
-                    <img src="https://cdn.discordapp.com/attachments/1227779114824368170/1543293746794209491/53_-removebg-preview.png?ex=6a9457ce&is=6a93064e&hm=c8feca54c2a369ec678dc22dbf6f199d3ddbcc9a4c901d189e2eb7192db93116" class="gift-img" alt="Cute Cake Reward">
+                    <img src="https://cdn.discordapp.com/attachments/1227779114824368170/1543293746794209491/53_-removebg-preview.png?ex=6a9457ce&is=6a93064e&hm=c8feca54c2a369ec678dc22dbf6f199d3ddbcc9a4c901d189e2eb7192db93116" class="gift-img" alt="cake Reward">
                     <div class="gift-title">sweet cake & parfait voucher!</div>
                     <span class="bubble-text" style="font-size: 15px;">"you worked so hard! treat yourself to a sweet pastry! voucher: STUDY-PASTRY-99"</span>
                 </div>
